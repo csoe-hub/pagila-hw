@@ -14,17 +14,19 @@ jobs:
 
       - name: Build and start database
         run: |
-          docker-compose up -d --build
+          docker compose up -d --build
+          docker ps -a
 
       - name: Wait for Postgres
         run: |
           for i in $(seq 1 60); do
-            docker-compose exec -T pg pg_isready -U postgres && exit 0
+            docker compose exec -T pg pg_isready -U postgres && exit 0
             sleep 1
           done
-          docker-compose logs pg || true
+          echo "Postgres did not become ready" >&2
+          docker compose logs pg || true
           exit 1
 
       - name: Run tests
         run: |
-          docker-compose exec -T pg ./run_tests.sh
+          docker compose exec -T pg ./run_tests.sh
