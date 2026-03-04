@@ -1,4 +1,4 @@
-# pagila-hw [![](https://github.com/csoe-hub/pagila-hw/actions/workflows/tests.yml/badge.svg)](https://github.com/csoe-hub/pagila-hw/actions?query=workflow%3Atests)
+# pagila-hw [![](https://github.com/csoe-hub/pagila-hw/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/csoe-hub/pagila-hw/actions/workflows/tests.yml)
 
 ## Background
 
