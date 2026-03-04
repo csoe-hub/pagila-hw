@@ -1,10 +1,22 @@
 /*
- * Use a JOIN to count the number films in each category in the specified language.
- * Use table category, film_category, film, and language.
- */
+* Use a JOIN to count the number films in each category in the specified language.
+* Use table category, film_category, film, and language.
+*/
 CREATE OR REPLACE FUNCTION category_counts_by_language(TEXT) RETURNS TABLE(name TEXT, count BIGINT) AS
 $$
--- FIXME: implementation goes here
+SELECT
+c.name,
+COUNT(*) AS count
+FROM category AS c
+JOIN film_category AS fc
+ON fc.category_id = c.category_id
+JOIN film AS f
+ON f.film_id = fc.film_id
+JOIN language AS l
+ON l.language_id = f.language_id
+WHERE l.name = $1
+GROUP BY c.name
+ORDER BY c.name;
 $$
 LANGUAGE SQL
 IMMUTABLE
