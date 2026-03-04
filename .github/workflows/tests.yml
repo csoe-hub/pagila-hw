@@ -1,43 +1,26 @@
 name: tests
-
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  docker:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Build and start database
-        run: |
-          docker compose up -d --build
-          docker ps -a
+      - run: docker compose up -d --build
 
-      - name: Wait for Postgres
+      - name: Wait for Pagila to finish loading
         run: |
-          for i in $(seq 1 60); do
-            docker compose exec -T pg pg_isready -U postgres && exit 0
-            sleep 1
+          for i in {1..60}; do
+            docker compose exec -T pg psql -U postgres -d postgres -c "SELECT 1 FROM actor LIMIT 1;" >/dev/null 2>&1 && exit 0
+            sleep 2
           done
-          echo "Postgres did not become ready" >&2
-          docker compose logs pg || true
+          docker compose logs pg
           exit 1
 
-      - name: Run tests
-        run: |
-          docker compose exec -T pg ./run_tests.sh || {
-            echo "---- FAILING DIFFS ----"
-            docker compose exec -T pg bash -lc '
-              for f in 11 12 13; do
-                if [ -f results/$f.out ]; then
-                  echo "===== diff expected/$f.out results/$f.out ====="
-                  diff -B expected/$f.out results/$f.out || true
-                fi
-              done
-            '
-            exit 1
-          }
+      - run: docker compose exec -T pg ./run_tests.sh
