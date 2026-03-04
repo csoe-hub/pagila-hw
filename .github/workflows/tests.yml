@@ -29,4 +29,15 @@ jobs:
 
       - name: Run tests
         run: |
-          docker compose exec -T pg ./run_tests.sh
+          docker compose exec -T pg ./run_tests.sh || {
+            echo "---- FAILING DIFFS ----"
+            docker compose exec -T pg bash -lc '
+              for f in 11 12 13; do
+                if [ -f results/$f.out ]; then
+                  echo "===== diff expected/$f.out results/$f.out ====="
+                  diff -B expected/$f.out results/$f.out || true
+                fi
+              done
+            '
+            exit 1
+          }
