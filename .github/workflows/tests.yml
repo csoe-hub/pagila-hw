@@ -22,7 +22,6 @@ jobs:
             docker-compose exec -T pg pg_isready -U postgres && exit 0
             sleep 1
           done
-          echo "Postgres did not become ready in time" >&2
           docker-compose logs pg || true
           exit 1
 
